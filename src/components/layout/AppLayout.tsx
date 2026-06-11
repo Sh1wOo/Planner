@@ -4,7 +4,7 @@ import { clsx } from "clsx"
 import { useMe, useLogout } from "../../hooks/useAuth"
 import { useToast } from "../ui/Toast"
 import dashboardBg from "../../assets/dashboard.jpeg"
-import logo from "../../assets/logo.jpg"
+import logo from "../../assets/logo.png"
 
 const AUTH_ACCENT = "#9a8689"
 const AUTH_ACCENT_HOVER = "#8b777a"

@@ -2,6 +2,10 @@ export interface User {
   id: number
   email: string
   username: string
+  telegram_id?: number | string | null
+  telegram_username?: string | null
+  telegram_first_name?: string | null
+  telegram_last_name?: string | null
 }
 
 export type Priority = 'low' | 'medium' | 'high'
