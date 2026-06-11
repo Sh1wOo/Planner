@@ -1,40 +1,45 @@
-import { forwardRef } from 'react'
-import { clsx } from 'clsx'
+import * as React from "react";
+import { clsx } from "clsx";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
-  hint?: string
+  label?: string;
+  error?: string;
+  className?: string;
 }
 
-export const Input = forwardRef<HTMLInputElement, Props>(
-  ({ label, error, hint, className, id, ...props }, ref) => {
-    const inputId = id ?? label?.toLowerCase().replace(/\s/g, '-')
-    return (
-      <div className="flex flex-col gap-1.5">
-        {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-[#28251d]">
-            {label}
-          </label>
+export const Input = React.forwardRef<HTMLInputElement, Props>(function Input(
+  { label, error, className, id, ...props },
+  ref,
+) {
+  const inputId = id ?? props.name ?? label?.toLowerCase().replace(/\s+/g, "-");
+
+  return (
+    <div className="w-full space-y-2">
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="block text-[13px] font-medium text-inherit/80"
+        >
+          {label}
+        </label>
+      )}
+
+      <input
+        ref={ref}
+        id={inputId}
+        className={clsx(
+          "block h-12 w-full rounded-xl border bg-transparent px-4 py-3 text-sm leading-normal transition-all",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          "focus-visible:ring-4 focus-visible:ring-white/10",
+          error
+            ? "border-red-400/60 focus-visible:border-red-400"
+            : "border-white/12 focus-visible:border-white/30",
+          className,
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={clsx(
-            'h-10 w-full rounded-xl border bg-white px-3 text-sm text-[#28251d]',
-            'placeholder:text-[#bab9b4] transition-all duration-150',
-            'focus:outline-none focus:ring-2 focus:ring-[#01696f]/30 focus:border-[#01696f]',
-            error
-              ? 'border-[#a12c7b] focus:ring-[#a12c7b]/20'
-              : 'border-[#d4d1ca] hover:border-[#7a7974]',
-            className,
-          )}
-          {...props}
-        />
-        {error && <p className="text-xs text-[#a12c7b]">{error}</p>}
-        {hint && !error && <p className="text-xs text-[#7a7974]">{hint}</p>}
-      </div>
-    )
-  }
-)
-Input.displayName = 'Input'
+        {...props}
+      />
+
+      {error && <p className="text-[12px] text-red-300">{error}</p>}
+    </div>
+  );
+});

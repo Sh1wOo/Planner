@@ -11,7 +11,7 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-[#01696f] text-white hover:bg-[#0c4e54] active:bg-[#0f3638] shadow-sm',
+  primary: 'bg-[#88726f] text-white hover:bg-[#6b5956] active:bg-[#0f3638] shadow-sm',
   secondary: 'bg-white text-[#28251d] border border-[#d4d1ca] hover:bg-[#f3f0ec] active:bg-[#edeae5]',
   ghost: 'text-[#28251d] hover:bg-[#f3f0ec] active:bg-[#edeae5]',
   danger: 'bg-[#a12c7b]/10 text-[#a12c7b] hover:bg-[#a12c7b]/20 border border-[#a12c7b]/20',
@@ -30,7 +30,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(
       disabled={disabled || loading}
       className={clsx(
         'inline-flex items-center justify-center gap-2 font-medium transition-all duration-150',
-        'focus-visible:outline-2 focus-visible:outline-[#01696f] focus-visible:outline-offset-2',
+        'focus-visible:outline-2 focus-visible:outline-[#6b5956] focus-visible:outline-offset-2',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],

@@ -7,7 +7,6 @@ import { GuestRoute } from './components/auth/GuestRoute'
 import { AppLayout } from './components/layout/AppLayout'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
-import { DashboardPage } from './pages/DashboardPage'
 import { TasksPage } from './pages/TasksPage'
 import { CalendarPage } from './pages/CalendarPage'
 
@@ -41,14 +40,6 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <AppLayout><TasksPage /></AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <ProtectedRoute>
-                  <AppLayout><DashboardPage /></AppLayout>
                 </ProtectedRoute>
               }
             />

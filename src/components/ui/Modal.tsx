@@ -138,10 +138,10 @@ function ModalInner({
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-5 pb-4">
+      <div className="flex items-center text-center justify-between px-6 pt-5 pb-4">
         <h2
           id="modal-title"
-          className="text-lg font-semibold leading-snug tracking-tight text-gray-900"
+          className="text-lg text-center font-semibold leading-snug tracking-tight text-gray-900"
         >
           {title}
         </h2>

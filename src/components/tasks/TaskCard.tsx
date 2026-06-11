@@ -1,187 +1,118 @@
-import { useState } from 'react'
-import { Pencil, Trash2, Check, Calendar } from 'lucide-react'
-import { clsx } from 'clsx'
-import { PriorityBadge } from '../ui/Badge'
+import { useMemo, useState } from 'react'
+import { Pencil, Trash2, CalendarDays, Check } from 'lucide-react'
+import clsx from 'clsx'
+import { format } from 'date-fns'
+import { ru } from 'date-fns/locale'
 import { Modal } from '../ui/Modal'
 import { TaskForm } from './TaskForm'
 import { useUpdateTask, useDeleteTask } from '../../hooks/useTasks'
 import { useToast } from '../ui/Toast'
 import type { Task, TaskUpdate } from '../../types'
-import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
 
-const priorityAccent: Record<string, string> = {
-  high:   '#ef4444',
-  medium: '#f59e0b',
-  low:    '#22c55e',
+const priorityMap: Record<Task['priority'], { label: string; tone: string; soft: string; dot: string }> = {
+  low: { label: 'Низкий', tone: '#8ee05b', soft: '#293424', dot: '#8ee05b' },
+  medium: { label: 'Средний', tone: '#f0c85f', soft: '#3a3220', dot: '#f0c85f' },
+  high: { label: 'Высокий', tone: '#ff7b72', soft: '#382424', dot: '#ff7b72' },
 }
 
 export function TaskCard({ task }: { task: Task }) {
   const [editOpen, setEditOpen] = useState(false)
-  const [completing, setCompleting] = useState(false)
   const update = useUpdateTask()
-  const del = useDeleteTask()
+  const remove = useDeleteTask()
   const toast = useToast()
 
-  const toggle = async () => {
-    setCompleting(true)
+  const priority = priorityMap[task.priority] ?? priorityMap.medium
+
+  const formattedDate = useMemo(() => {
+    if (!task.due_date) return 'Без даты'
+    try {
+      return format(new Date(`${task.due_date}T12:00:00`), 'd MMMM', { locale: ru })
+    } catch {
+      return task.due_date
+    }
+  }, [task.due_date])
+
+  const handleToggle = async () => {
     await update.mutateAsync({ id: task.id, data: { completed: !task.completed } })
-    toast.success(task.completed ? 'Задача возобновлена' : 'Задача выполнена!')
-    setTimeout(() => setCompleting(false), 400)
+    toast.success(task.completed ? 'Задача снова активна' : 'Задача завершена')
   }
 
   const handleUpdate = async (data: TaskUpdate) => {
     await update.mutateAsync({ id: task.id, data })
-    toast.success('Задача обновлена')
+    toast.success('Изменения сохранены')
     setEditOpen(false)
   }
 
   const handleDelete = async () => {
     if (!confirm('Удалить задачу?')) return
-    await del.mutateAsync(task.id)
+    await remove.mutateAsync(task.id)
     toast.success('Задача удалена')
   }
 
-  const dateStr = (() => {
-    try { return format(new Date(task.due_date + 'T12:00:00'), 'd MMM', { locale: ru }) }
-    catch { return task.due_date }
-  })()
-
-  const accent = priorityAccent[task.priority] ?? '#94a3b8'
-
   return (
     <>
-<div
-  className={clsx(
-    'group relative overflow-hidden',
-    'rounded-3xl',
-    'bg-white/80 backdrop-blur-xl',
-    'border border-white/40',
-    'shadow-[0_10px_40px_rgba(0,0,0,0.08)]',
-    'p-4',
-    'min-h-[96px]',
-    'transition-all duration-300',
-    'hover:-translate-y-1 hover:shadow-[0_16px_50px_rgba(0,0,0,0.12)]',
-    task.completed && 'opacity-60'
-  )}
->
-  {/* Gradient Accent */}
-  <div
-    className="absolute left-0 top-0 h-full w-1"
-    style={{
-      background:
-        task.priority === 'high'
-          ? 'linear-gradient(180deg,#ef4444,#f97316)'
-          : task.priority === 'medium'
-          ? 'linear-gradient(180deg,#f59e0b,#facc15)'
-          : 'linear-gradient(180deg,#22c55e,#10b981)',
-    }}
-  />
+      <article className={clsx(
+        'w-full overflow-hidden rounded-[24px] border border-white/8 text-black shadow-[0_14px_34px_rgba(0,0,0,0.18)]',
+        task.completed && 'opacity-90'
+      )}>
+        <div className="w-full p-3">
+          <div className="flex w-full items-center gap-3 rounded-[20px] border border-white/6 bg-white/[0.05] px-4 py-4">
+            <button
+              type="button"
+              onClick={handleToggle}
+              className={clsx(
+                'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200',
+                task.completed
+                  ? 'border-[#8ee05b] bg-[#8ee05b] text-[#0f140f] shadow-[0_0_0_4px_rgba(142,224,91,0.16)]'
+                  : ' bg-transparent text-transparent hover:border-white/40'
+              )}
+              aria-label={task.completed ? 'Сделать невыполненной' : 'Отметить выполненной'}
+            >
+              <Check className="h-5 w-5" strokeWidth={3} />
+            </button>
 
-  <div className="flex gap-4">
-    {/* Checkbox */}
-    <button
-      onClick={toggle}
-      className={clsx(
-        'w-7 h-7 mt-0.5 shrink-0',
-        'rounded-xl border-2',
-        'flex items-center justify-center',
-        'transition-all duration-200',
-        task.completed
-          ? 'border-transparent scale-105'
-          : 'border-slate-300 hover:border-slate-500'
-      )}
-      style={{
-        background: task.completed ? accent : undefined,
-      }}
-    >
-      {task.completed && (
-        <Check
-          className="w-4 h-4 text-white"
-          strokeWidth={3}
-        />
-      )}
-    </button>
+            <div className="min-w-0 flex-1">
+              <h3 className={clsx(
+                'break-words text-[17px] font-medium leading-[1.3] tracking-[-0.03em] text-white',
+                task.completed && 'text-white/45 line-through'
+              )}>
+                {task.title}
+              </h3>
 
-    <div className="flex-1 min-w-0">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3
-            className={clsx(
-              'font-semibold text-[15px] leading-6',
-              'text-slate-900',
-              task.completed &&
-                'line-through text-slate-400'
-            )}
-          >
-            {task.title}
-          </h3>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1.5 text-[12px] font-medium text-white/75">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  <span>{formattedDate}</span>
+                </div>
 
-          {task.description && (
-            <p className="mt-1 text-sm text-slate-500 line-clamp-2">
-              {task.description}
-            </p>
-          )}
+                <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium" style={{ background: priority.soft, color: priority.tone }}>
+                  <span className="h-2 w-2 rounded-full" style={{ background: priority.dot }} />
+                  <span>{priority.label}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/65 transition-all hover:bg-white/[0.11] hover:text-white active:scale-90"
+                aria-label="Редактировать"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/65 transition-all hover:bg-[#402525] hover:text-[#ff8d87] active:scale-90"
+                aria-label="Удалить"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div className="flex items-center gap-1 text-xs text-slate-400 shrink-0">
-          <Calendar className="w-3.5 h-3.5" />
-          {dateStr}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="mt-3 flex items-center justify-between">
-        <div
-          className="px-3 py-1 rounded-full text-xs font-medium"
-          style={{
-            backgroundColor: `${accent}15`,
-            color: accent,
-          }}
-        >
-          {task.priority === 'high'
-            ? '🔥 Высокий'
-            : task.priority === 'medium'
-            ? '⚡ Средний'
-            : '🌱 Низкий'}
-        </div>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="
-              w-10 h-10
-              rounded-xl
-              flex items-center justify-center
-              text-slate-500
-              hover:bg-indigo-50
-              hover:text-indigo-600
-              transition-all
-            "
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={handleDelete}
-            className="
-              w-10 h-10
-              rounded-xl
-              flex items-center justify-center
-              text-slate-500
-              hover:bg-red-50
-              hover:text-red-600
-              transition-all
-            "
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </article>
 
       <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Редактировать задачу">
         <TaskForm
@@ -193,12 +124,4 @@ export function TaskCard({ task }: { task: Task }) {
       </Modal>
     </>
   )
-}
-
-/** Convert #rrggbb → "r, g, b" for CSS custom property */
-function hexToRgb(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `${r}, ${g}, ${b}`
 }
