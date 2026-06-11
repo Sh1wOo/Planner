@@ -92,7 +92,7 @@ export function LoginPage() {
 									Planner
 								</p>
 								<p className='text-xs text-white/45'>
-									Focus on what matters
+									Фокусируйтесь на важном
 								</p>
 							</div>
 						</div>

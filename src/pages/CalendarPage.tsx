@@ -98,7 +98,7 @@ export function CalendarPage(): JSX.Element {
 					<div className='grid gap-5 p-4 sm:p-6 lg:grid-cols-[1.2fr_0.8fr] lg:p-7'>
 						<div>
 							<p className='text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35 sm:text-[11px]'>
-								Calendar overview
+								Главная страница
 							</p>
 
 							<h1 className='mt-2 text-[28px] font-semibold tracking-[-0.05em] text-white sm:mt-3 sm:text-[34px]'>
@@ -190,7 +190,7 @@ export function CalendarPage(): JSX.Element {
 								className='col-span-2 rounded-[22px] border border-white/10 bg-white/[0.04] p-4 text-left text-white transition hover:bg-white/[0.08] active:scale-[0.99] sm:rounded-[24px] lg:col-span-1'
 							>
 								<p className='text-[10px] uppercase tracking-[0.14em] text-white/42 sm:text-[11px]'>
-									Quick action
+									Быстрое действие
 								</p>
 								<p className='mt-2 text-base font-semibold sm:text-lg'>
 									Добавить задачу
@@ -228,11 +228,11 @@ export function CalendarPage(): JSX.Element {
 									type='button'
 									onClick={() => setSelected(day)}
 									className={clsx(
-										"relative flex h-[60px] min-h-[60px] flex-col items-center justify-center rounded-[18px] border text-[13px] font-semibold transition-all duration-200 active:scale-[0.97] sm:h-16 sm:min-h-16 sm:rounded-[22px] sm:text-sm",
+										"relative flex h-[60px] min-h-[60px] flex-col items-center justify-center rounded-[18px] border-2 text-[13px] font-semibold transition-all duration-200 active:scale-[0.97] sm:h-16 sm:min-h-16 sm:rounded-[22px] sm:text-sm",
 										isSelected
 											? "text-white"
 											: isCurrentDay
-												? "border-white/18 bg-white/[0.10] text-white"
+												? "border-white/30 bg-white/[0.12] text-white"
 												: "border-white/8 bg-white/[0.03] text-white/72 hover:bg-white/[0.06]",
 										!isCurrentMonth && "text-white/28",
 									)}
@@ -245,7 +245,12 @@ export function CalendarPage(): JSX.Element {
 														AUTH_ACCENT_SOFT,
 													boxShadow: `0 10px 24px ${AUTH_ACCENT_RING}`,
 												}
-											: undefined
+											: isCurrentDay
+												? {
+														borderColor: "#ffffff",
+														boxShadow: "0 0 12px rgba(255,255,255,0.15)",
+													}
+												: undefined
 									}
 									aria-pressed={isSelected}
 									aria-label={format(day, "d MMMM yyyy", {
@@ -254,15 +259,14 @@ export function CalendarPage(): JSX.Element {
 								>
 									<span>{format(day, "d")}</span>
 									<span
-										className='mt-1.5 h-1.5 w-1.5 rounded-full sm:mt-2'
+										className='mt-1.5 h-2 w-2 rounded-full sm:mt-2'
 										style={{
-											background: hasMarker
-												? isSelected
-													? AUTH_ACCENT_TEXT
-													: isCurrentDay
-														? "#ffffff"
-														: AUTH_ACCENT
-												: "transparent",
+											background:
+												hasMarker || isCurrentDay
+													? isSelected
+														? AUTH_ACCENT_TEXT
+														: "#ffffff"
+													: "transparent",
 										}}
 									/>
 								</button>

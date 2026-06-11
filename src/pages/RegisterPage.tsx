@@ -100,7 +100,8 @@ export function RegisterPage() {
 										Planner
 									</p>
 									<p className='mt-1 text-[12px] leading-none text-white/45'>
-										Start planning beautifully
+										Начните планировать свои цели красиво
+										и эффективно
 									</p>
 								</div>
 							</div>

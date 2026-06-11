@@ -177,7 +177,7 @@ export function TasksPage() {
 					<div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
 						<div>
 							<p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-white/35'>
-								Tasks workspace
+								Все задачи
 							</p>
 							<h1 className='mt-2 text-[34px] font-semibold tracking-[-0.04em] text-white'>
 								Управление задачами
