@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router"
 import { gsap } from "gsap"
 import { Input } from "../components/ui/Input"
 import { Button } from "../components/ui/Button"
-import { authApi } from "../api/auth"
+// import { authApi } from "../api/auth"
 import { useRegister } from "../hooks/useAuth"
 import { useToast } from "../components/ui/Toast"
 import { getTelegramWebAppInfo } from "../utils/telegram"
@@ -55,16 +55,6 @@ export function RegisterPage() {
 		return Object.keys(e).length === 0
 	}
 
-	const linkTelegramIfAvailable = async () => {
-		const payload = getTelegramWebAppInfo()
-		if (!payload) return
-
-		try {
-			await authApi.linkTelegram(payload)
-		} catch (err) {
-			console.warn("Не удалось связать Telegram-профиль:", err)
-		}
-	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -72,7 +62,6 @@ export function RegisterPage() {
 
 		try {
 			await register.mutateAsync({ email, username, password })
-			await linkTelegramIfAvailable()
 			toast.success("Аккаунт создан!")
 			navigate("/dashboard")
 		} catch (err) {

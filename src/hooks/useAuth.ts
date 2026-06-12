@@ -1,44 +1,93 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { authApi } from '../api/auth'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  getMe,
+  login,
+  register,
+  logout,
+  refresh,
+  linkTelegram,
+  type LoginPayload,
+  type RegisterPayload,
+  type User,
+} from "../api/auth";
+import { getTelegramInitData } from "../lib/telegram";
 
-export const AUTH_KEY = ['auth', 'me']
+const ME_QUERY_KEY = ["me"];
+
+async function tryLinkTelegram() {
+  const initData = getTelegramInitData();
+
+  if (!initData) {
+    console.warn("Telegram initData not found");
+    return null;
+  }
+
+  try {
+    const result = await linkTelegram(initData);
+    console.log("Telegram linked", result);
+    return result;
+  } catch (error) {
+    console.error("Telegram link failed", error);
+    return null;
+  }
+}
 
 export function useMe() {
-  return useQuery({
-    queryKey: AUTH_KEY,
-    queryFn: authApi.me,
+  return useQuery<User>({
+    queryKey: ME_QUERY_KEY,
+    queryFn: getMe,
     retry: false,
-    staleTime: 1000 * 60 * 5,
-  })
+  });
 }
 
 export function useLogin() {
-  const qc = useQueryClient()
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: authApi.login,
-    onSuccess: (user) => {
-      qc.setQueryData(AUTH_KEY, user)
+    mutationFn: async (payload: LoginPayload) => {
+      const authData = await login(payload);
+      await tryLinkTelegram();
+      return authData;
     },
-  })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    },
+  });
 }
 
 export function useRegister() {
-  const qc = useQueryClient()
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: authApi.register,
-    onSuccess: (user) => {
-      qc.setQueryData(AUTH_KEY, user)
+    mutationFn: async (payload: RegisterPayload) => {
+      const authData = await register(payload);
+      await tryLinkTelegram();
+      return authData;
     },
-  })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    },
+  });
 }
 
 export function useLogout() {
-  const qc = useQueryClient()
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: authApi.logout,
-    onSuccess: () => {
-      qc.setQueryData(AUTH_KEY, null)
-      qc.clear()
+    mutationFn: logout,
+    onSuccess: async () => {
+      queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
     },
-  })
+  });
+}
+
+export function useRefresh() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: refresh,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    },
+  });
 }

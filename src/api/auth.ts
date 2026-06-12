@@ -1,27 +1,47 @@
-import { api } from './client'
-import type { User } from '../types'
+import { api } from "./client";
 
-export interface TelegramLinkPayload {
-  telegram_id: number | string
-  username?: string
-  first_name?: string
-  last_name?: string
-  init_data?: string
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  telegram_id?: number | null;
+  telegram_username?: string | null;
+  telegram_first_name?: string | null;
 }
 
-export const authApi = {
-  register: (data: { email: string; username: string; password: string }) =>
-    api.post<User>('/auth/register', data),
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
 
-  login: (data: { email: string; password: string }) =>
-    api.post<User>('/auth/login', data),
+export interface RegisterPayload {
+  email: string;
+  username: string;
+  password: string;
+}
 
-  logout: () => api.post<void>('/auth/logout'),
+export async function login(payload: LoginPayload) {
+  return await api.post("auth/login", payload);
+}
 
-  refresh: () => api.post<User>('/auth/refresh'),
+export async function register(payload: RegisterPayload) {
+  return await api.post("auth/register", payload);
+}
 
-  me: () => api.get<User>('/auth/me'),
+export async function logout() {
+  return await api.post("auth/logout", {});
+}
 
-  linkTelegram: (data: TelegramLinkPayload) =>
-    api.post<User>('/auth/telegram', data),
+export async function refresh() {
+  return await api.post("auth/refresh", {});
+}
+
+export async function linkTelegram(initData: string) {
+  return await api.post("auth/telegram/link", {
+    init_data: initData,
+  });
+}
+
+export async function getMe(): Promise<User> {
+  return (await api.get("auth/me")) as User;
 }

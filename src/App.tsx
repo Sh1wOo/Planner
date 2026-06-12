@@ -9,6 +9,8 @@ import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { TasksPage } from './pages/TasksPage'
 import { CalendarPage } from './pages/CalendarPage'
+import { useEffect } from 'react'
+import { initTelegramWebApp } from './lib/telegram'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +19,10 @@ const queryClient = new QueryClient({
 })
 
 export default function App() {
+  useEffect(() => {
+    initTelegramWebApp();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
