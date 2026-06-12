@@ -1,4 +1,4 @@
-const BASE = 'https://planner-core.raduga.top/api'
+const BASE = 'https://planner-core.raduga.top/'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
